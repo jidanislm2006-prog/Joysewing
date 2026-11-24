@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="description" content="JOY SEWING SERVICING CENTER - সার্ভিসিং কাজের হিসাব">
+<link rel="manifest" href="manifest.webmanifest">
+<title>JOY SEWING – সার্ভিস ম্যানেজার</title>
+<style>
+:root{--ink:#111;--muted:#666;--line:#ddd;--paper:#fff;--soft:#f4f4f4}
+*{box-sizing:border-box}body{margin:0;background:#f1f1f1;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+header{background:#111;color:#fff;padding:16px max(14px,calc((100% - 900px)/2));}
+header h1{font-size:19px;margin:0 0 3px;letter-spacing:.2px}header p{margin:0;color:#ccc;font-size:12px}
+main{max-width:900px;margin:auto;padding:12px 12px 80px}
+.panel{background:#fff;border:1px solid #ddd;border-radius:13px;padding:13px;margin:0 0 12px}
+h2{font-size:15px;margin:0 0 11px}.muted{color:var(--muted);font-size:12px}
+.profile-grid,.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.stat{border:1px solid #ddd;border-radius:10px;padding:11px;min-width:0}.stat small{display:block;color:#666;font-size:11px}.stat strong{font-size:22px;display:block;margin-top:2px}
+.stat.wide{grid-column:1/-1;background:#111;color:#fff;border-color:#111}.stat.wide small{color:#ddd}
+label{display:block;font-size:12px;font-weight:650;margin:0 0 5px}
+input,textarea,select{width:100%;border:1px solid #ccc;border-radius:8px;padding:10px;font:inherit;font-size:14px;background:#fff;color:#111;min-width:0}
+textarea{min-height:70px;resize:vertical}
+.field{margin-bottom:10px}
+button{border:1px solid #111;background:#111;color:#fff;border-radius:9px;padding:10px 13px;font:inherit;font-size:13px;font-weight:650;cursor:pointer}
+button.secondary{background:#fff;color:#111}button.danger{background:#fff;color:#a00;border-color:#a00}button.small{padding:6px 9px;font-size:12px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 9px}.full{grid-column:1/-1}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}.toolbar input{flex:1}
+.job{border:1px solid #ddd;border-radius:10px;padding:11px;margin-top:8px}
+.jobtop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.job h3{font-size:14px;margin:0}.job p{font-size:12px;color:#555;margin:5px 0}
+.pill{display:inline-block;border:1px solid #aaa;border-radius:99px;padding:3px 8px;font-size:11px;white-space:nowrap}
+.jobfoot{display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid #eee;padding-top:8px;margin-top:8px;font-size:12px}
+.hidden{display:none!important}.empty{text-align:center;padding:20px;color:#666;font-size:13px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ccc;display:flex;justify-content:center;gap:7px;padding:9px 10px calc(9px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;max-width:180px}
+.note{font-size:11px;color:#666;line-height:1.5}
+@media(min-width:650px){.stats{grid-template-columns:repeat(5,minmax(0,1fr))}.stat.wide{grid-column:auto}.profile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:390px){main{padding:9px}.panel{padding:11px}.stat{padding:9px}.stat strong{font-size:20px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}}
+@media print{body{background:#fff}header,nav,.no-print,#jobFormPanel,.toolbar button{display:none!important}main{padding:0}.panel,.job{break-inside:avoid;border-color:#aaa}}
+</style>
+</head>
+<body>
+<header><h1>JOY SEWING SERVICING CENTER</h1><p>সার্ভিসিং ম্যানেজমেন্ট সফটওয়্যার</p></header>
+<main>
+<section class="panel">
+ <div class="actions no-print" style="justify-content:space-between;align-items:center;margin-bottom:10px"><h2 style="margin:0">কাস্টমার / কোম্পানির তথ্য</h2><button class="secondary small" id="editProfileBtn">তথ্য সম্পাদনা</button></div>
+ <div id="profileView" class="profile-grid"></div>
+ <form id="profileForm" class="hidden">
+  <div class="form-grid">
+   <div class="field full"><label>কাস্টমারের কোম্পানির নাম</label><input id="company" required placeholder="কোম্পানির নাম"></div>
+   <div class="field"><label>কাস্টমারের / কাজ জমাদানকারীর নাম</label><input id="person" placeholder="নাম"></div>
+   <div class="field"><label>মোবাইল নম্বর</label><input id="phone" inputmode="tel" placeholder="01XXXXXXXXX"></div>
+  </div><div class="actions"><button>সংরক্ষণ</button><button type="button" class="secondary" id="cancelProfile">বাতিল</button></div>
+ </form>
+</section>
+
+<section class="panel">
+ <h2>কাজের সারসংক্ষেপ</h2>
+ <div class="stats">
+  <div class="stat"><small>মোট জমা</small><strong id="totalCount">০</strong></div>
+  <div class="stat"><small>ডেলিভারি</small><strong id="deliveredCount">০</strong></div>
+  <div class="stat"><small>পেন্ডিং</small><strong id="pendingCount">০</strong></div>
+  <div class="stat"><small>কাজ চলছে</small><strong id="runningCount">০</strong></div>
+  <div class="stat wide"><small>বর্তমানে বকেয়া বিল</small><strong id="dueTotal">৳ ০</strong></div>
+ </div>
+</section>
+
+<section class="panel" id="jobFormPanel">
+ <h2 id="formTitle">নতুন সার্ভিসিং কাজ জমা</h2>
+ <form id="jobForm">
+  <div class="form-grid">
+   <div class="field"><label>মেশিন / পণ্যের নাম *</label><input id="machine" required placeholder="যেমন: Jack A4C"></div>
+   <div class="field"><label>জমার তারিখ *</label><input id="received" type="date" required></div>
+   <div class="field full"><label>সমস্যার বিবরণ</label><textarea id="problem" placeholder="মেশিনের কী সমস্যা..."></textarea></div>
+   <div class="field full"><label>কাজের বিবরণ</label><textarea id="work" placeholder="কী কাজ করতে হবে / করা হয়েছে..."></textarea></div>
+   <div class="field"><label>অবস্থা</label><select id="status"><option>পেন্ডিং</option><option>কাজ চলছে</option><option>সম্পন্ন</option><option>ডেলিভারি</option></select></div>
+   <div class="field"><label>মোট বিল (টাকা)</label><input id="bill" type="number" min="0" step="0.01" value="0"></div>
+   <div class="field"><label>জমা টাকা (টাকা)</label><input id="paid" type="number" min="0" step="0.01" value="0"></div>
+   <div class="field"><label>ডেলিভারির তারিখ</label><input id="delivered" type="date"></div>
+  </div>
+  <div class="actions"><button id="saveJobBtn">কাজ সংরক্ষণ</button><button type="button" class="secondary" id="resetJob">নতুন ফর্ম</button></div>
+  <p class="note">বকেয়া টাকা = মোট বিল − জমা টাকা। একই কাজ পরে সম্পাদনা করে অবস্থা ও বিল আপডেট করতে পারবে।</p>
+ </form>
+</section>
+
+<section class="panel">
+ <div class="toolbar"><h2 style="margin:0;flex:1">সার্ভিসিং কাজের তালিকা</h2><button class="secondary small" onclick="window.print()">প্রিন্ট / PDF</button></div>
+ <div class="toolbar"><input id="search" placeholder="মেশিন বা সমস্যা খুঁজুন..."><select id="filter" style="max-width:130px"><option value="">সব কাজ</option><option>পেন্ডিং</option><option>কাজ চলছে</option><option>সম্পন্ন</option><option>ডেলিভারি</option></select></div>
+ <div id="jobsList"></div>
+</section>
+
+<section class="panel no-print">
+ <h2>ডেটা ব্যাকআপ</h2>
+ <p class="note">ফোন হারালে বা ব্রাউজারের ডেটা মুছে গেলে কাজের হিসাব হারাতে পারো। নিয়মিত ব্যাকআপ ডাউনলোড করে নিরাপদে রাখো। অন্য ফোনে নিতে ব্যাকআপ ফাইল ইমপোর্ট করো।</p>
+ <div class="actions">
+  <button id="exportBtn">ব্যাকআপ ডাউনলোড</button>
+  <button class="secondary" id="importBtn">ব্যাকআপ ইমপোর্ট</button>
+  <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+ </div>
+ <p class="note" id="backupMsg" aria-live="polite"></p>
+</section>
+</main>
+<nav class="no-print"><button id="goDashboard">ড্যাশবোর্ড</button><button id="goNew" class="secondary">+ নতুন কাজ</button><button id="goList" class="secondary">কাজের তালিকা</button></nav>
+<script>
+const KEY='joy_service_manager_v1';
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+let db={profile:{company:'',person:'',phone:''},jobs:[]}, editingId=null;
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&x.jobs&&x.profile)db=x}catch(e){}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function money(n){return '৳ '+Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderProfile(){
+ $('profileView').innerHTML=`<div><div class="muted">কোম্পানি</div><b>${esc(db.profile.company||'তথ্য যোগ করা হয়নি')}</b></div><div><div class="muted">যোগাযোগকারী</div><b>${esc(db.profile.person||'—')}</b></div><div><div class="muted">মোবাইল</div><b>${esc(db.profile.phone||'—')}</b></div>`;
+}
+function renderStats(){
+ const j=db.jobs;$('totalCount').textContent=j.length.toLocaleString('bn-BD');
+ $('deliveredCount').textContent=j.filter(x=>x.status==='ডেলিভারি').length.toLocaleString('bn-BD');
+ $('pendingCount').textContent=j.filter(x=>x.status==='পেন্ডিং').length.toLocaleString('bn-BD');
+ $('runningCount').textContent=j.filter(x=>x.status==='কাজ চলছে').length.toLocaleString('bn-BD');
+ $('dueTotal').textContent=money(j.reduce((s,x)=>s+Math.max(0,Number(x.bill||0)-Number(x.paid||0)),0));
+}
+function renderJobs(){
+ const q=$('search').value.trim().toLowerCase(), f=$('filter').value;
+ const list=db.jobs.filter(x=>(!f||x.status===f)&&(!q||[x.machine,x.problem,x.work,x.id].join(' ').toLowerCase().includes(q))).sort((a,b)=>b.created-a);
+ if(!list.length){$('jobsList').innerHTML='<div class="empty">কোনো কাজ পাওয়া যায়নি। নতুন কাজ যোগ করো।</div>';return}
+ $('jobsList').innerHTML=list.map(x=>{const due=Math.max(0,Number(x.bill||0)-Number(x.paid||0));return `<article class="job">
+ <div class="jobtop"><div><h3>${esc(x.machine)} <span class="muted">#${esc(x.id)}</span></h3><p>জমা: ${esc(x.received||'—')} ${x.delivered?' · ডেলিভারি: '+esc(x.delivered):''}</p></div><span class="pill">${esc(x.status)}</span></div>
+ ${x.problem?`<p><b>সমস্যা:</b> ${esc(x.problem)}</p>`:''}${x.work?`<p><b>কাজ:</b> ${esc(x.work)}</p>`:''}
+ <div class="jobfoot"><span>বিল ${money(x.bill)} · জমা ${money(x.paid)} · <b>বাকি ${money(due)}</b></span><span class="actions"><button class="secondary small" onclick="editJob('${x.id}')">এডিট</button><button class="danger small" onclick="deleteJob('${x.id}')">মুছুন</button></span></div>
+ </article>`}).join('');
+}
+function render(){renderProfile();renderStats();renderJobs()}
+function clearForm(){editingId=null;$('jobForm').reset();$('received').value=today();$('bill').value=0;$('paid').value=0;$('status').value='পেন্ডিং';$('formTitle').textContent='নতুন সার্ভিসিং কাজ জমা';$('saveJobBtn').textContent='কাজ সংরক্ষণ'}
+function editJob(id){const x=db.jobs.find(j=>j.id===id);if(!x)return;editingId=id;['machine','received','problem','work','status','bill','paid','delivered'].forEach(k=>$(k).value=x[k]??'');$('formTitle').textContent='সার্ভিসিং কাজ সম্পাদনা · #'+id;$('saveJobBtn').textContent='পরিবর্তন সংরক্ষণ';$('jobFormPanel').scrollIntoView({behavior:'smooth'})}
+function deleteJob(id){if(!confirm('এই সার্ভিসিং কাজটি মুছে ফেলতে চাও?'))return;db.jobs=db.jobs.filter(x=>x.id!==id);save()}
+$('profileForm').addEventListener('submit',e=>{e.preventDefault();db.profile={company:$('company').value.trim(),person:$('person').value.trim(),phone:$('phone').value.trim()};$('profileForm').classList.add('hidden');$('profileView').classList.remove('hidden');save()});
+$('editProfileBtn').onclick=()=>{$('company').value=db.profile.company;$('person').value=db.profile.person;$('phone').value=db.profile.phone;$('profileForm').classList.remove('hidden');$('profileView').classList.add('hidden')};
+$('cancelProfile').onclick=()=>{$('profileForm').classList.add('hidden');$('profileView').classList.remove('hidden')};
+$('jobForm').addEventListener('submit',e=>{e.preventDefault();const bill=Number($('bill').value||0),paid=Number($('paid').value||0);if(paid>bill){if(!confirm('জমা টাকা মোট বিলের চেয়ে বেশি। তবুও সংরক্ষণ করবে?'))return}
+ const data={machine:$('machine').value.trim(),received:$('received').value,problem:$('problem').value.trim(),work:$('work').value.trim(),status:$('status').value,bill,paid,delivered:$('delivered').value};
+ if(editingId){const i=db.jobs.findIndex(x=>x.id===editingId);if(i>=0)db.jobs[i]={...db.jobs[i],...data}}
+ else{const id=String(Date.now()).slice(-8);db.jobs.push({id,...data,created:Date.now()})}
+ save();clearForm();$('backupMsg').textContent='কাজ সংরক্ষণ হয়েছে।';
+});
+$('resetJob').onclick=clearForm;$('search').oninput=renderJobs;$('filter').onchange=renderJobs;
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='JOY-Service-Backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href);$('backupMsg').textContent='ব্যাকআপ ফাইল ডাউনলোড হয়েছে।'};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x.profile||!Array.isArray(x.jobs))throw Error();if(!confirm('বর্তমান ডেটা ব্যাকআপের ডেটা দিয়ে প্রতিস্থাপন হবে। চালিয়ে যাবে?'))return;db=x;save();$('backupMsg').textContent='ব্যাকআপ ইমপোর্ট সম্পন্ন হয়েছে।'}catch(err){alert('সঠিক ব্যাকআপ JSON ফাইল নির্বাচন করো।')}e.target.value=''};
+$('goDashboard').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});$('goNew').onclick=()=>$('jobFormPanel').scrollIntoView({behavior:'smooth'});$('goList').onclick=()=>$('jobsList').scrollIntoView({behavior:'smooth'});
+load();clearForm();render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
